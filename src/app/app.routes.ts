@@ -5,7 +5,7 @@ import { Signupcomponent } from './Helpers/signupcomponent/signupcomponent';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  {
+ {
     path: '',
     redirectTo: '/login',
     pathMatch: 'full'
@@ -20,7 +20,8 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: Dashboard,
+    loadComponent: () => import('./Helpers/dashboard/dashboard')
+      .then(m => m.Dashboard),
     canActivate: [AuthGuard]
   },
   {

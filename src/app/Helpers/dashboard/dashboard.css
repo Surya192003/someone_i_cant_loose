@@ -1,222 +1,286 @@
 /* =========================================
-   Container & Background
+   Premium Container & Background
 ========================================= */
 .dashboard-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  /* Soft, romantic gradient background */
-  background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+  justify-content: flex-start;
+  /* Changed from harsh dark grey to a very soft, warm white base */
+  background: #fdfbfb; 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 2rem;
-  box-sizing: border-box;
+  position: relative;
+  overflow-y: auto;
+  color: #4a3f41; /* Premium warm dark text instead of stark black */
 }
 
-/* =========================================
-   Theme Indicator
-========================================= */
-.theme-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  color: #d63031;
-  font-weight: bold;
-  box-shadow: 0 4px 15px rgba(238, 156, 167, 0.3);
+/* Elegant, subtle blush overlay */
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  /* Very soft champagne-to-blush gradient */
+  background: linear-gradient(135deg, #fdfbfb 0%, #f6eaec 100%);
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+  z-index: 0;
 }
 
-.mood-icon { font-size: 1.5rem; }
+.dashboard-container.animate-in .bg-overlay {
+  opacity: 1;
+}
 
-/* =========================================
-   Glassmorphism Card
-========================================= */
-.dashboard-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  padding: 3rem 2.5rem;
+.dashboard-content {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 550px;
-  box-shadow: 0 15px 35px rgba(200, 80, 95, 0.15);
+  max-width: 1200px;
+}
+
+/* =========================================
+   Greeting Section
+========================================= */
+.greeting-section {
   text-align: center;
+  margin-bottom: 3.5rem;
+  animation: fadeSlideDown 0.8s ease-out;
 }
 
-/* =========================================
-   Header & Animations
-========================================= */
-.header h1 {
-  color: #2d3436;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-}
-
-@keyframes heartbeat {
-  0% { transform: scale(1); }
-  14% { transform: scale(1.3); }
-  28% { transform: scale(1); }
-  42% { transform: scale(1.3); }
-  70% { transform: scale(1); }
-}
-
-.heart-pulse {
-  font-size: 3.5rem;
+.greeting-icon {
+  font-size: 3rem;
   display: inline-block;
-  animation: heartbeat 1.5s infinite;
-}
-
-/* =========================================
-   Love Letter Section
-========================================= */
-.love-letter {
-  background: rgba(255, 107, 129, 0.1);
-  border-left: 4px solid #ff6b81;
-  padding: 1.5rem;
-  border-radius: 0 12px 12px 0;
-  margin-bottom: 2.5rem;
-  text-align: left;
-}
-
-.love-letter p {
-  color: #2d3436;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin: 0 0 1rem 0;
-}
-
-.love-letter p.highlight {
-  margin: 0;
-  font-weight: 600;
-  color: #d63031;
-  font-style: italic;
-}
-
-/* =========================================
-   User Profile & Dates
-========================================= */
-.user-profile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-  text-align: left;
-}
-
-.avatar {
-  font-size: 4rem;
-  background: #ffe0e6;
-  width: 90px;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(255, 107, 129, 0.2);
-}
-
-.user-details h2 {
-  margin: 0 0 0.5rem 0;
-  color: #2d3436;
-  font-size: 1.5rem;
-}
-
-.anniversary-badge {
-  display: inline-block;
-  background: #ff6b81;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 50px;
-  font-size: 0.85rem;
+  animation: gentlePulse 3s infinite ease-in-out;
   margin-bottom: 0.5rem;
 }
 
-.anniversary-badge .label { opacity: 0.9; margin-right: 0.3rem; }
-.anniversary-badge .date { font-weight: bold; }
-
-.days-count {
-  margin: 0;
-  color: #636e72;
-  font-size: 0.95rem;
+.greeting-section h1 {
+  color: #4a3f41;
+  font-size: 2.4rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  letter-spacing: -0.5px;
 }
-.days-count strong {
-  color: #d63031;
+
+.sub-greeting {
+  color: #8a7e80;
   font-size: 1.1rem;
+  font-weight: 400;
+  margin: 0;
 }
 
 /* =========================================
-   Stats Section
+   Premium Uniform Tile Grid
 ========================================= */
-.stats {
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  animation: fadeSlideUp 0.8s ease-out 0.3s both;
+  margin-bottom: 3rem;
+}
+
+/* 
+  Unified Glassmorphism Tiles
+  Removed the chaotic multi-colors. Now they are premium frosted glass.
+*/
+.tile {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 10px 30px rgba(180, 150, 160, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.tile:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(180, 150, 160, 0.15);
+}
+
+.tile-icon {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.tile h3 {
+  color: #4a3f41;
+  margin: 0 0 0.4rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.tile p {
+  color: #8a7e80;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* =========================================
+   Subtle Accents (Rose Gold & Warm Tones)
+========================================= */
+.member-since {
+  margin-top: 1rem;
+  padding: 0.4rem 1.2rem;
+  background: rgba(200, 121, 123, 0.1);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #c37077;
+  font-weight: 500;
+}
+
+.big-number {
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #d28c92, #b56566);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0.5rem 0;
+}
+
+.tile-progress {
+  margin-top: 1rem;
+  width: 100%;
+  height: 6px;
+  background: rgba(200, 121, 123, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #d28c92, #b56566);
+  border-radius: 4px;
+}
+
+.quote-text {
+  font-style: italic;
+  font-size: 1.05rem !important;
+  color: #5c4f51 !important;
+  line-height: 1.6;
+}
+
+.quote-author {
+  color: #c37077 !important;
+  font-weight: 500;
+  margin-top: 0.8rem !important;
+}
+
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  margin-bottom: 2.5rem;
+  margin-top: 1.2rem;
+  width: 100%;
 }
 
-.stat-card {
-  background: rgba(255, 255, 255, 0.6);
-  padding: 1.2rem 0.5rem;
-  border-radius: 12px;
-  transition: transform 0.3s ease;
-  border: 1px dashed #ffb8b8;
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.stat-card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.9);
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #c37077;
 }
 
-.stat-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.stat-info h3 {
-  margin: 0 0 0.3rem 0;
-  font-size: 0.9rem;
-  color: #636e72;
-}
-
-.stat-info p {
-  margin: 0;
-  font-weight: bold;
-  color: #2d3436;
-  font-size: 0.9rem;
+.stat-label {
+  font-size: 0.8rem;
+  color: #8a7e80;
+  margin-top: 0.3rem;
 }
 
 /* =========================================
-   Logout Button
+   Premium Buttons
 ========================================= */
-.logout-btn {
-  background: #ff6b81;
+.tile-btn, .logout-btn {
+  margin-top: 1.2rem;
+  padding: 0.7rem 1.8rem;
+  background: linear-gradient(135deg, #d28c92, #c37077);
   color: white;
   border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 50px;
-  font-size: 1.1rem;
-  font-weight: bold;
+  border-radius: 25px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(195, 112, 119, 0.25);
 }
 
-.logout-btn:hover {
-  background: #ff4757;
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(255, 107, 129, 0.6);
+.tile-btn:hover, .logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(195, 112, 119, 0.4);
 }
 
-/* Responsive fix for small phones */
-@media (max-width: 480px) {
-  .stats { grid-template-columns: 1fr; }
-  .user-profile { flex-direction: column; text-align: center; }
-  .love-letter { text-align: center; border-left: none; border-top: 4px solid #ff6b81; border-radius: 0 0 12px 12px; }
+/* =========================================
+   DIARY COMPONENT FIX 
+   (No white lines, gorgeous distinct background)
+========================================= */
+.diary-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 2rem;
+  /* Distinct, soft solid background so it stands out beautifully */
+  background: #ffffff;
+  border-radius: 24px;
+  /* Elegant, soft shadow to lift it off the page */
+  box-shadow: 0 12px 40px rgba(170, 140, 150, 0.12);
+  animation: fadeSlideUp 0.8s ease-out 0.6s both;
+  
+  /* CRITICAL: Overriding any existing borders */
+  border: none !important; 
+}
+
+/* Remove the old borders that were causing the ugly white lines */
+app-diary {
+  display: block;
+  width: 100%;
+}
+
+::ng-deep app-diary > * {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* =========================================
+   Animations
+========================================= */
+@keyframes gentlePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   Responsive
+========================================= */
+@media (max-width: 768px) {
+  .dashboard-container { padding: 1.5rem 1rem; }
+  .greeting-section h1 { font-size: 1.8rem; }
+  .tile-grid { gap: 1rem; }
+  .tile { padding: 1.5rem; }
+  .diary-wrapper { padding: 1.5rem; border-radius: 16px; }
 }

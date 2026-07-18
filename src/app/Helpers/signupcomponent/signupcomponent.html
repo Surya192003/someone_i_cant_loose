@@ -1,14 +1,22 @@
 <div class="signup-container">
-  <!-- Sad/Black & White Theme -->
-  <div class="sad-theme">
+  <!-- Romantic Theme Indicator -->
+  <div class="romantic-theme">
     <div class="theme-indicator">
-      <span class="mood-icon">😢</span>
-      <span class="mood-text">Black & White Mode</span>
+      <span class="mood-icon">💖</span>
+      <span class="mood-text">Only For You, My Love</span>
     </div>
   </div>
 
   <!-- Main Card -->
   <div class="auth-card">
+    <!-- Special Exclusive Message -->
+    <div class="exclusive-message">
+      <div class="heart-rain">💕</div>
+      <h1>You're The Only One</h1>
+      <p class="sub-title">No one else in this world gets this much importance</p>
+    </div>
+
+    <!-- Form Container -->
     <div class="auth-forms">
       
       <!-- Error/Success Messages -->
@@ -18,17 +26,19 @@
       <div *ngIf="successMessage" class="success-message">
         ✅ {{ successMessage }}
       </div>
-      
-      <!-- Special Heart Taken Message -->
-      <div *ngIf="showHeartTakenMessage" class="heart-taken-message">
-        <div class="heart-icon">💔</div>
-        <div class="message-text">This heart is already taken!</div>
-        <div class="sub-message">Please try a different username or email.</div>
+
+      <!-- Special Message for This Person Only -->
+      <div class="special-message">
+        <div class="crown-icon">👑</div>
+        <div class="message-text">You are the best in this world!</div>
+        <div class="sub-message">This page is exclusively for you, my love ❤️</div>
+        <div class="heart-line">💕 ✨ 💕 ✨ 💕</div>
       </div>
 
       <!-- Signup Form -->
       <form [formGroup]="signupForm" (ngSubmit)="onSignup()" class="auth-form">
-        <h2>Create Account</h2>
+        <h2>Create Your Account</h2>
+        <p class="form-subtitle">Because you deserve the world 🌍</p>
         
         <div class="form-group">
           <label for="signup-username">Username</label>
@@ -36,7 +46,7 @@
             type="text" 
             id="signup-username" 
             formControlName="username"
-            placeholder="Choose a username"
+            placeholder="Enter your special username"
             [class.error]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
           >
           <small *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched" class="field-error">
@@ -86,9 +96,34 @@
           </small>
         </div>
 
+        <!-- The Special Question -->
+        <div class="special-question">
+          <p class="question-text">💭 Why do you want to register?</p>
+          <div class="answer-options">
+            <label class="answer-option">
+              <input type="radio" name="reason" value="love" checked>
+              <span>Because I love you ❤️</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="reason" value="special">
+              <span>Because I'm special to you ✨</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="reason" value="only">
+              <span>Because I'm the only one 💕</span>
+            </label>
+          </div>
+        </div>
+
         <button type="submit" class="auth-btn" [disabled]="signupForm.invalid || isLoading">
-          {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+          {{ isLoading ? 'Creating Your Account...' : 'Sign Up - Just for You 💕' }}
         </button>
+
+        <!-- Important Notice -->
+        <div class="notice">
+          <p>⚠️ This page is exclusively for my one and only love.</p>
+          <p class="notice-sub">No one else can register here.</p>
+        </div>
 
         <p class="toggle-link">
           Already have an account? 

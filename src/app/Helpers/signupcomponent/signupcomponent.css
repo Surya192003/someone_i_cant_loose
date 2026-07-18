@@ -4,35 +4,64 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
   position: relative;
   overflow: hidden;
   padding: 20px;
 }
 
-/* Sad Theme - Black & White */
-.sad-theme {
+/* Animated Background Hearts */
+.signup-container::before {
+  content: '💕';
+  position: absolute;
+  font-size: 40px;
+  animation: floatHearts 15s ease-in-out infinite;
+  opacity: 0.1;
+  top: 10%;
+  left: 5%;
+}
+
+.signup-container::after {
+  content: '❤️';
+  position: absolute;
+  font-size: 60px;
+  animation: floatHearts 20s ease-in-out infinite reverse;
+  opacity: 0.08;
+  bottom: 15%;
+  right: 8%;
+}
+
+@keyframes floatHearts {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-30px) rotate(10deg); }
+  75% { transform: translateY(30px) rotate(-10deg); }
+}
+
+/* Romantic Theme */
+.romantic-theme {
   position: absolute;
   top: 20px;
   right: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px 20px;
-  border-radius: 20px;
-  color: #ccc;
+  background: rgba(255, 107, 129, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 50px;
+  color: #ff6b81;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.5px;
-  border: 1px solid #444;
-  backdrop-filter: blur(5px);
+  border: 2px solid rgba(255, 107, 129, 0.3);
   z-index: 10;
-  animation: fadeIn 0.5s ease-in;
+  animation: fadeIn 0.8s ease-in;
+  box-shadow: 0 8px 32px rgba(255, 107, 129, 0.2);
 }
 
-.sad-theme .mood-icon {
-  font-size: 20px;
+.romantic-theme .mood-icon {
+  font-size: 22px;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .theme-indicator {
@@ -43,39 +72,94 @@
 
 .mood-text {
   font-size: 14px;
+  color: #ff6b81;
+  text-shadow: 0 0 20px rgba(255, 107, 129, 0.3);
 }
 
 /* Auth Card */
 .auth-card {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
   padding: 40px;
   width: 100%;
-  max-width: 450px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   transition: all 0.6s ease-in-out;
   position: relative;
   z-index: 5;
-  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Exclusive Message */
+.exclusive-message {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(255, 107, 129, 0.2);
+}
+
+.heart-rain {
+  font-size: 40px;
+  animation: rainHearts 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes rainHearts {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.1); }
+}
+
+.exclusive-message h1 {
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff6b81, #ff4757, #ff6b81);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 3s ease-in-out infinite;
+  margin: 10px 0;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.sub-title {
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: 0.5px;
 }
 
 /* Auth Forms */
 .auth-forms {
-  animation: fadeIn 0.5s ease-in;
+  animation: fadeIn 0.6s ease-in;
 }
 
 .auth-form h2 {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
+  margin-bottom: 5px;
+  font-size: 26px;
   font-weight: 700;
   color: #333;
   letter-spacing: 0.5px;
 }
 
+.form-subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 25px;
+  font-style: italic;
+}
+
 /* Form Groups */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
@@ -91,23 +175,24 @@
   width: 100%;
   padding: 12px 16px;
   border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 15px;
   transition: all 0.3s ease;
-  background: white;
+  background: #f8f9fa;
   color: #333;
   box-sizing: border-box;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  border-color: #ff6b81;
+  box-shadow: 0 0 0 3px rgba(255, 107, 129, 0.15);
+  background: white;
 }
 
 .form-group input.error {
   border-color: #ff4757;
-  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.15);
 }
 
 .form-group input::placeholder {
@@ -126,7 +211,7 @@
   background: #ff4757;
   color: white;
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 20px;
   font-size: 14px;
   font-weight: 500;
@@ -138,7 +223,7 @@
   background: #2ed573;
   color: white;
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   margin-bottom: 20px;
   font-size: 14px;
   font-weight: 500;
@@ -146,63 +231,26 @@
   animation: slideUp 0.3s ease-out;
 }
 
-/* Heart Taken Message */
-.heart-taken-message {
-  background: linear-gradient(135deg, #ff6b81, #ff4757);
-  color: white;
+/* Special Message */
+.special-message {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: #d63031;
   padding: 24px 20px;
   border-radius: 16px;
   margin-bottom: 24px;
   text-align: center;
-  animation: heartBreak 0.8s ease-out;
-  box-shadow: 0 8px 30px rgba(255, 71, 87, 0.3);
-  position: relative;
-  overflow: hidden;
+  animation: specialEnter 0.8s ease-out;
+  box-shadow: 0 8px 30px rgba(255, 107, 129, 0.3);
+  border: 2px solid rgba(255, 107, 129, 0.2);
 }
 
-.heart-taken-message::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: shimmer 2s ease-in-out infinite;
-}
-
-.heart-icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 12px;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.message-text {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  position: relative;
-  z-index: 1;
-}
-
-.sub-message {
-  font-size: 14px;
-  opacity: 0.9;
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes heartBreak {
+@keyframes specialEnter {
   0% {
-    transform: scale(0.5) rotate(-10deg);
+    transform: scale(0.8) rotate(-5deg);
     opacity: 0;
   }
-  30% {
-    transform: scale(1.1) rotate(3deg);
-  }
   60% {
-    transform: scale(0.9) rotate(-2deg);
+    transform: scale(1.05) rotate(2deg);
   }
   100% {
     transform: scale(1) rotate(0deg);
@@ -210,35 +258,122 @@
   }
 }
 
-@keyframes shimmer {
-  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-  50% { transform: translate(-30%, -30%) rotate(180deg); }
+.crown-icon {
+  font-size: 50px;
+  display: block;
+  margin-bottom: 10px;
+  animation: crownPulse 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+@keyframes crownPulse {
+  0%, 100% { transform: scale(1) rotate(-5deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
+.message-text {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.sub-message {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.heart-line {
+  font-size: 18px;
+  letter-spacing: 8px;
+}
+
+/* Special Question */
+.special-question {
+  background: linear-gradient(135deg, rgba(255, 107, 129, 0.05), rgba(255, 154, 158, 0.05));
+  border: 2px dashed rgba(255, 107, 129, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 20px 0;
+}
+
+.question-text {
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.answer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.answer-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #555;
+}
+
+.answer-option:hover {
+  background: rgba(255, 107, 129, 0.1);
+}
+
+.answer-option input[type="radio"] {
+  accent-color: #ff6b81;
+  width: 18px;
+  height: 18px;
+}
+
+.answer-option span {
+  font-weight: 500;
 }
 
 /* Buttons */
 .auth-btn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff6b81 0%, #ff4757 100%);
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 18px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
   letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  animation: buttonShine 3s ease-in-out infinite;
+}
+
+@keyframes buttonShine {
+  0%, 100% { transform: translateX(-100%) rotate(45deg); }
+  50% { transform: translateX(100%) rotate(45deg); }
 }
 
 .auth-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(255, 71, 87, 0.4);
 }
 
 .auth-btn:active:not(:disabled) {
@@ -251,16 +386,37 @@
   transform: none;
 }
 
+/* Notice */
+.notice {
+  text-align: center;
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(255, 107, 129, 0.08);
+  border-radius: 10px;
+  border-left: 4px solid #ff6b81;
+}
+
+.notice p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.notice-sub {
+  font-weight: 600;
+  color: #ff6b81 !important;
+}
+
 /* Toggle Link */
 .toggle-link {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 16px;
   font-size: 14px;
   color: #666;
 }
 
 .toggle-link a {
-  color: #667eea;
+  color: #ff6b81;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -268,37 +424,37 @@
 }
 
 .toggle-link a:hover {
-  color: #764ba2;
+  color: #ff4757;
   text-decoration: underline;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-10px); }
   75% { transform: translateX(10px); }
+}
+
+/* Floating Hearts Background */
+.floating-hearts {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
 }
 
 /* Responsive Design */
@@ -308,8 +464,12 @@
     max-width: 95%;
   }
 
+  .exclusive-message h1 {
+    font-size: 22px;
+  }
+
   .auth-form h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .form-group input {
@@ -318,27 +478,19 @@
   }
 
   .auth-btn {
-    font-size: 16px;
+    font-size: 15px;
     padding: 12px;
   }
 
-  .sad-theme {
+  .romantic-theme {
     top: 10px;
     right: 10px;
-    padding: 6px 14px;
+    padding: 8px 16px;
     font-size: 12px;
   }
 
-  .sad-theme .mood-icon {
-    font-size: 16px;
-  }
-
-  .heart-taken-message {
-    padding: 20px 16px;
-  }
-
-  .heart-icon {
-    font-size: 36px;
+  .romantic-theme .mood-icon {
+    font-size: 18px;
   }
 
   .message-text {
@@ -351,8 +503,12 @@
     padding: 20px 15px;
   }
 
-  .auth-form h2 {
+  .exclusive-message h1 {
     font-size: 20px;
+  }
+
+  .auth-form h2 {
+    font-size: 18px;
   }
 
   .form-group input {
@@ -365,15 +521,15 @@
     padding: 10px;
   }
 
+  .answer-options {
+    font-size: 13px;
+  }
+
   .heart-icon {
     font-size: 32px;
   }
 
   .message-text {
     font-size: 16px;
-  }
-
-  .sub-message {
-    font-size: 12px;
   }
 }

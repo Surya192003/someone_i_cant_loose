@@ -1,8 +1,7 @@
-// src/app/services/auth.service.ts
-
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import { API_CONFIG } from '../config/api.config';
 
 export interface User {
@@ -42,18 +41,27 @@ export class AuthService {
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    // Check localStorage on init
-    const savedUser = localStorage.getItem('currentUser');
-    const token = localStorage.getItem('authToken');
+  private isBrowser: boolean;
+
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     
-    if (savedUser && token) {
-      try {
-        const user = JSON.parse(savedUser);
-        this.currentUserSubject.next(user);
-        this.isLoggedInSubject.next(true);
-      } catch (e) {
-        this.clearAuthData();
+    // Only check localStorage if running in browser
+    if (this.isBrowser) {
+      const savedUser = localStorage.getItem('currentUser');
+      const token = localStorage.getItem('authToken');
+      
+      if (savedUser && token) {
+        try {
+          const user = JSON.parse(savedUser);
+          this.currentUserSubject.next(user);
+          this.isLoggedInSubject.next(true);
+        } catch (e) {
+          this.clearAuthData();
+        }
       }
     }
   }
@@ -62,7 +70,7 @@ export class AuthService {
     const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`;
     return this.http.post<AuthResponse>(url, credentials).pipe(
       tap(response => {
-        if (response.success && response.user && response.token) {
+        if (this.isBrowser && response.success && response.user && response.token) {
           localStorage.setItem('currentUser', JSON.stringify(response.user));
           localStorage.setItem('authToken', response.token);
           this.currentUserSubject.next(response.user);
@@ -79,10 +87,10 @@ export class AuthService {
 
   logout(): Observable<any> {
     const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.logout}`;
-    const token = localStorage.getItem('authToken');
-    const headers = {
+    const token = this.isBrowser ? localStorage.getItem('authToken') : null;
+    const headers = new HttpHeaders({
       'Authorization': token ? `Bearer ${token}` : ''
-    };
+    });
     
     return this.http.post(url, {}, { headers }).pipe(
       tap(() => {
@@ -92,8 +100,10 @@ export class AuthService {
   }
 
   private clearAuthData(): void {
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('authToken');
+    if (this.isBrowser) {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
+    }
     this.currentUserSubject.next(null);
     this.isLoggedInSubject.next(false);
   }
@@ -107,6 +117,9 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    if (this.isBrowser) {
+      return localStorage.getItem('authToken');
+    }
+    return null;
   }
 }

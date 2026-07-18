@@ -1,70 +1,115 @@
-<div class="dashboard-container">
-  <!-- Romantic Theme Indicator -->
-  <div class="happy-theme">
-    <div class="theme-indicator">
-      <span class="mood-icon">💖</span>
-      <span class="mood-text">My Favorite Person Mode</span>
+<div class="dashboard-container" [class.animate-in]="isAnimated">
+  <!-- Soft, premium background overlay -->
+  <div class="bg-overlay"></div>
+  
+  <div class="dashboard-content">
+    <!-- Header with greeting -->
+    <div class="greeting-section">
+      <div class="greeting-icon">💖</div>
+      <h1>{{ welcomeMessage }}, My Love ✨</h1>
+      <p class="sub-greeting">Every moment with you is magical</p>
     </div>
-  </div>
 
-  <!-- Dashboard Content -->
-  <div class="dashboard-card">
-    <div class="content">
-      <div class="header">
-        <div class="heart-pulse">❤️</div>
-        <h1>{{ welcomeMessage }}, My Love ✨</h1>
-      </div>
-
-      <div class="welcome-section">
-        
-        <!-- The Special Message -->
-        <div class="love-letter">
-          <p>Everything you do is sooo special and caring for me. It means the absolute world to have you in my life.</p>
-          <p class="highlight">Even a whole day with you feels like seconds in my life. ⏳❤️</p>
-        </div>
-        
-        <div class="user-profile">
-          <div class="avatar">🥰</div>
-          <div class="user-details">
-            <h2>{{ currentUser?.username || 'Swetha' }}</h2>
-            <div class="anniversary-badge">
-              <span class="label">Our story started:</span>
-              <span class="date">January 24, 2025</span>
-            </div>
-            <p class="days-count">Loving you for <strong>{{ daysTogether }}</strong> beautiful days and counting...</p>
-          </div>
-        </div>
-
-        <div class="stats">
-          <div class="stat-card">
-            <div class="stat-icon">🥺</div>
-            <div class="stat-info">
-              <h3>Your Care</h3>
-              <p>Unmatched</p>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">⏳</div>
-            <div class="stat-info">
-              <h3>Time Together</h3>
-              <p>Passes too fast</p>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">♾️</div>
-            <div class="stat-info">
-              <h3>My Love</h3>
-              <p>Endless</p>
-            </div>
+    <!-- Tile Grid -->
+    <div class="tile-grid">
+      <!-- Profile Tile -->
+      <div class="tile">
+        <div class="tile-icon">👤</div>
+        <div class="tile-content">
+          <h3>{{ currentUser?.username || 'Swetha' }}</h3>
+          <p>My Favorite Person</p>
+          <div class="member-since">
+            <span>💕 Since Jan 24, 2025</span>
           </div>
         </div>
       </div>
 
-      <div class="action-section">
-        <button class="logout-btn" (click)="onLogout()">
-          See you soon! 💕
-        </button>
+      <!-- Days Together Tile -->
+      <div class="tile">
+        <div class="tile-icon">❤️</div>
+        <div class="tile-content">
+          <div class="big-number">{{ daysTogether }}</div>
+          <p>Beautiful Days Together</p>
+          <div class="tile-progress">
+            <div class="progress-bar" [style.width.%]="daysTogether % 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Love Quote Tile -->
+      <div class="tile">
+        <div class="tile-icon">💌</div>
+        <div class="tile-content">
+          <p class="quote-text">"Even a whole day with you feels like seconds"</p>
+          <p class="quote-author">- My Heart</p>
+        </div>
+      </div>
+
+      <!-- Memories Tile -->
+      <div class="tile">
+        <div class="tile-icon">📸</div>
+        <div class="tile-content">
+          <h3>Our Memories</h3>
+          <p>Click to relive our beautiful moments</p>
+          <button class="tile-btn" (click)="viewMemories()">
+            View Memories ✨
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Tile -->
+      <div class="tile">
+        <div class="tile-icon">📊</div>
+        <div class="tile-content">
+          <h3>Love Stats</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-value">∞</span>
+              <span class="stat-label">My Love</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">🥺</span>
+              <span class="stat-label">Your Care</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">⭐</span>
+              <span class="stat-label">Special</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Tile -->
+      <div class="tile">
+        <div class="tile-icon">💕</div>
+        <div class="tile-content">
+          <h3>See You Soon!</h3>
+          <p>Come back to me whenever you miss me</p>
+          <button class="logout-btn" (click)="onLogout()">
+            Take Care 💕
+          </button>
+        </div>
       </div>
     </div>
+    
+    <!-- Diary Section (Fixed borders and background) -->
+    <div class="diary-wrapper">
+      <app-diary></app-diary>
+    </div>
+    <div class="love-letter-section">
+      <div class="letter-divider">
+        <span class="star-icon">✨</span>
+      </div>
+      
+      <p class="letter-text">
+        "I was lost before I met her, and I was used to a life where people took my presence and heart for granted, asked for stupid things, and took light of me. But when she entered, I found I have a heart. I have a preference. I'm a human... I deserve some excitement and all."
+      </p>
+      
+      <p class="letter-highlight">
+        I love you so much, Swetha... my lovely best friend, my care, my love, and my all. <br>
+        Hope this stays forever. 🤍
+      </p>
+    </div>
+
   </div>
 </div>
