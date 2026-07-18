@@ -92,19 +92,21 @@ export class Dashboard implements OnInit {
     // this.router.navigate(['/memories']);
   }
 
-  onLogout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
-    }
-    
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this.router.navigate(['/login']);
-      }
-    });
+onLogout(): void {
+  this.router.navigate(['/login']);
+
+  // Clear everything
+  if (isPlatformBrowser(this.platformId)) {
+    // Remove specific items
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    // Or clear everything (use with caution)
+    // localStorage.clear();
   }
+
+  // Reset state
+  this.currentUser = null;
+  
+  // Navigate to login
+}
 }

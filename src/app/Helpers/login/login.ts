@@ -26,7 +26,7 @@ export class Login implements OnInit {
   private readonly PREDEFINED_USERNAME = 'Swethaaaaaaa';
   private readonly PREDEFINED_PASSWORD = 'Missyoueveryday';
   private readonly PREDEFINED_USER = {
-    username: 'myLove',
+    username: 'Swethaaaaaaa',
     email: 'mylove@forever.com',
     createdAt: new Date('2025-01-24'),
     role: 'special'
@@ -54,33 +54,32 @@ export class Login implements OnInit {
   ngOnInit(): void {
     // Only run in browser
     if (isPlatformBrowser(this.platformId)) {
-      // Check if user is already logged in
+      // Check if user is already logged in via localStorage
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        try {
+          const user = JSON.parse(savedUser);
+          this.currentUser = user;
+          this.isLoggedIn = true;
+          // Navigate to dashboard if already logged in
+          this.router.navigate(['/dashboard']);
+          return;
+        } catch (e) {
+          // Ignore parsing errors
+        }
+      }
+
+      // Check auth service as fallback
       this.authService.currentUser$.subscribe(user => {
         if (user) {
           this.isLoggedIn = true;
           this.currentUser = user;
-          // Navigate to dashboard if already logged in
           this.router.navigate(['/dashboard']);
         } else {
           this.isLoggedIn = false;
           this.currentUser = null;
         }
       });
-
-      // Check if predefined user is already in localStorage
-      const savedUser = localStorage.getItem('currentUser');
-      if (savedUser) {
-        try {
-          const user = JSON.parse(savedUser);
-          if (user.username === this.PREDEFINED_USERNAME) {
-            this.isLoggedIn = true;
-            this.currentUser = user;
-            this.router.navigate(['/dashboard']);
-          }
-        } catch (e) {
-          // Ignore parsing errors
-        }
-      }
     }
   }
 
@@ -99,7 +98,7 @@ export class Login implements OnInit {
     this.signupForm.reset();
   }
 
-  async onLogin(): Promise<void> {
+  onLogin(): void {
     if (this.loginForm.invalid) {
       this.errorMessage = 'Please fill in all required fields correctly.';
       return;
@@ -109,64 +108,61 @@ export class Login implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    try {
-      const username = this.loginForm.get('username')?.value;
-      const password = this.loginForm.get('password')?.value;
+    const username = this.loginForm.get('username')?.value;
+    const password = this.loginForm.get('password')?.value;
 
-      // Check if predefined credentials match
-      if (username === this.PREDEFINED_USERNAME && password === this.PREDEFINED_PASSWORD) {
-        // Predefined user login - bypass backend
-        this.successMessage = 'Welcome back, my love! ❤️';
-        this.isLoggedIn = true;
-        this.currentUser = this.PREDEFINED_USER;
-        
-        // Save to localStorage
-        if (isPlatformBrowser(this.platformId)) {
-          localStorage.setItem('currentUser', JSON.stringify(this.PREDEFINED_USER));
-          localStorage.setItem('authToken', 'special-token-forever');
-        }
-
-        // Reset form
-        this.loginForm.reset();
-        
-        // Navigate to dashboard
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 500);
-        
-        this.isLoading = false;
-        return;
+    // Check if predefined credentials match
+    if (username === this.PREDEFINED_USERNAME && password === this.PREDEFINED_PASSWORD) {
+      // Predefined user login - bypass backend
+      this.successMessage = 'Welcome back, my love! ❤️';
+      this.isLoggedIn = true;
+      this.currentUser = this.PREDEFINED_USER;
+      
+      // Save to localStorage
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('currentUser', JSON.stringify(this.PREDEFINED_USER));
+        localStorage.setItem('authToken', 'special-token-forever');
       }
 
-      // If not predefined, try backend login
-      try {
-        const response = await this.authService.login({ username, password }).toPromise();
-        
+      // Reset form
+      this.loginForm.reset();
+      this.isLoading = false;
+      
+      // Navigate to dashboard
+      setTimeout(() => {
+        this.router.navigate(['/dashboard']);
+      }, 500);
+      return;
+    }
+
+    // If not predefined, try backend login (optional)
+    this.authService.login({ username, password }).subscribe({
+      next: (response: any) => {
         if (response?.success) {
           this.successMessage = response.message || 'Login successful!';
           this.isLoggedIn = true;
           this.currentUser = response.user;
           
-          // Save to localStorage
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('currentUser', JSON.stringify(response.user));
             localStorage.setItem('authToken', response.token || 'auth-token');
           }
 
-          // Reset form
           this.loginForm.reset();
+          this.isLoading = false;
           
-          // Navigate to dashboard
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 500);
         } else {
           this.errorMessage = response?.message || 'Login failed. Please try again.';
+          this.isLoading = false;
         }
-      } catch (backendError) {
-        // Backend failed, check if it's the predefined user again (fallback)
+      },
+      error: (error) => {
+        // Backend failed - check if predefined credentials work as fallback
         if (username === this.PREDEFINED_USERNAME && password === this.PREDEFINED_PASSWORD) {
-          this.successMessage = 'Welcome back, my love! ❤️ (Offline mode)';
+          this.successMessage = 'Welcome back, my love! ❤️';
           this.isLoggedIn = true;
           this.currentUser = this.PREDEFINED_USER;
           
@@ -176,22 +172,20 @@ export class Login implements OnInit {
           }
 
           this.loginForm.reset();
+          this.isLoading = false;
           
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 500);
         } else {
-          this.errorMessage = 'Backend is currently unavailable. Please use the predefined credentials or try again later.';
+          this.errorMessage = 'Login failed. Please check your credentials.';
+          this.isLoading = false;
         }
       }
-    } catch (error: any) {
-      this.errorMessage = error.error?.message || error.message || 'Login failed. Please try again.';
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 
-  async onSignup(): Promise<void> {
+  onSignup(): void {
     if (this.signupForm.invalid) {
       this.errorMessage = 'Please fill in all required fields correctly.';
       return;
@@ -202,87 +196,124 @@ export class Login implements OnInit {
     this.successMessage = '';
     this.showSignupMessage = false;
 
-    try {
-      const userData = {
-        username: this.signupForm.get('username')?.value,
-        email: this.signupForm.get('email')?.value,
-        password: this.signupForm.get('password')?.value
-      };
+    const userData = {
+      username: this.signupForm.get('username')?.value,
+      email: this.signupForm.get('email')?.value,
+      password: this.signupForm.get('password')?.value
+    };
 
-      // Check if trying to create an account with the predefined username
-      if (userData.username === this.PREDEFINED_USERNAME) {
-        this.showSignupMessage = true;
-        this.errorMessage = '';
-        this.isLoading = false;
-        return;
-      }
+    // Check if trying to create an account with the predefined username
+    if (userData.username === this.PREDEFINED_USERNAME) {
+      this.showSignupMessage = true;
+      this.errorMessage = '';
+      this.isLoading = false;
+      return;
+    }
 
-      const response = await this.authService.signup(userData).toPromise();
-      
-      if (response?.success) {
-        this.successMessage = response.message || 'Account created successfully!';
-        this.showSignupMessage = false;
-        
-        setTimeout(() => {
-          this.toggleMode();
-          this.successMessage = 'Account created! Please login.';
-        }, 1500);
-      } else {
-        if (response?.message?.includes('already taken')) {
+    this.authService.signup(userData).subscribe({
+      next: (response: any) => {
+        if (response?.success) {
+          this.successMessage = response.message || 'Account created successfully!';
+          this.showSignupMessage = false;
+          this.isLoading = false;
+          
+          setTimeout(() => {
+            this.toggleMode();
+            this.successMessage = 'Account created! Please login.';
+          }, 1500);
+        } else {
+          if (response?.message?.includes('already taken')) {
+            this.showSignupMessage = true;
+            this.errorMessage = '';
+          } else {
+            this.errorMessage = response?.message || 'Signup failed. Please try again.';
+          }
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        if (error.error?.message?.includes('already taken') || error.message?.includes('already taken')) {
           this.showSignupMessage = true;
           this.errorMessage = '';
         } else {
-          this.errorMessage = response?.message || 'Signup failed. Please try again.';
+          this.errorMessage = error.error?.message || error.message || 'Signup failed. Please try again.';
         }
+        this.isLoading = false;
       }
-    } catch (error: any) {
-      if (error.error?.message?.includes('already taken') || error.message?.includes('already taken')) {
-        this.showSignupMessage = true;
-        this.errorMessage = '';
-      } else {
-        this.errorMessage = error.error?.message || error.message || 'Signup failed. Please try again.';
-      }
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 
-  async onLogout(): Promise<void> {
-    try {
-      await this.authService.logout().toPromise();
-      this.isLoggedIn = false;
-      this.currentUser = null;
-      this.successMessage = 'Logged out successfully!';
-      
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('authToken');
-      }
-      
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 2000);
-    } catch (error) {
-      console.error('Logout error:', error);
-      this.isLoggedIn = false;
-      this.currentUser = null;
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('authToken');
-      }
-      this.router.navigate(['/login']);
+  onLogout(): void {
+    // Clear local storage
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
     }
+
+    // Reset state
+    this.isLoggedIn = false;
+    this.currentUser = null;
+    this.successMessage = 'Logged out successfully!';
+    
+    // Try backend logout if needed
+    this.authService.logout().subscribe({
+      next: () => {
+        // Successfully logged out from backend
+        setTimeout(() => {
+          this.successMessage = '';
+        }, 2000);
+      },
+      error: () => {
+        // Even if backend fails, we've cleared local storage
+        setTimeout(() => {
+          this.successMessage = '';
+        }, 2000);
+      }
+    });
+
+    // Navigate to login (stay on same page but show login form)
+    this.router.navigate(['/login']);
   }
+
+ goToDashboard(): void {
+  this.router.navigate(['/dashboard']);
+  // First, try to get user from component state
+  if (this.isLoggedIn && this.currentUser) {
+    // Save to localStorage just in case
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+    }
+    this.router.navigate(['/dashboard']);
+    return;
+  }
+  
+  // If not in component state, check localStorage
+  if (isPlatformBrowser(this.platformId)) {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        this.currentUser = user;
+        this.isLoggedIn = true;
+        this.router.navigate(['/dashboard']);
+        return;
+      } catch (e) {
+        // Ignore parsing errors
+        console.error('Error parsing saved user:', e);
+      }
+    }
+    
+  }
+  
+  // If all else fails, go to login
+  this.router.navigate(['/login']);
+}
 
   getLoginErrorMessage(): string {
     const control = this.loginForm.get('username');
     if (control?.hasError('required')) return 'Username is required';
     if (control?.hasError('minlength')) return 'Username must be at least 3 characters';
     return '';
-  }
-
-  goToDashboard(): void {
-    this.router.navigate(['/dashboard']);
   }
 
   getPasswordErrorMessage(): string {
@@ -292,7 +323,6 @@ export class Login implements OnInit {
     return '';
   }
 
-  // Helper method to get predefined credentials (can be used in template)
   getPredefinedCredentials(): { username: string; password: string } {
     return {
       username: this.PREDEFINED_USERNAME,
