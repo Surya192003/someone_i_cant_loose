@@ -1,0 +1,164 @@
+<div class="login-container" [class.logged-in]="isLoggedIn">
+  <!-- Sad/Black & White Theme - Visible when not logged in -->
+  <div class="sad-theme" *ngIf="!isLoggedIn">
+    <div class="theme-indicator">
+      <span class="mood-icon">😢</span>
+      <span class="mood-text">Black & White Mode</span>
+    </div>
+  </div>
+
+  <!-- Happy/Colorful Theme - Visible when logged in -->
+  <div class="happy-theme" *ngIf="isLoggedIn">
+    <div class="theme-indicator">
+      <span class="mood-icon">😊</span>
+      <span class="mood-text">Colorful Mode</span>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="auth-card" [class.logged-in-card]="isLoggedIn">
+    
+    <!-- Logged In State -->
+    <div *ngIf="isLoggedIn" class="logged-in-content">
+      <div class="welcome-section">
+        <div class="heart-animation">❤️</div>
+        <h2>Welcome back, {{ currentUser?.username }}! 🎉</h2>
+        <p class="welcome-message">You're logged in and spreading happiness! 🌈</p>
+        <div class="user-info">
+          <p><strong>Email:</strong> {{ currentUser?.email }}</p>
+          <p><strong>Member since:</strong> {{ currentUser?.createdAt | date:'mediumDate' }}</p>
+        </div>
+        <button class="logout-btn" (click)="onLogout()">
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Login/Signup Forms -->
+    <div *ngIf="!isLoggedIn" class="auth-forms">
+      
+      <!-- Error/Success Messages -->
+      <div *ngIf="errorMessage" class="error-message">
+        ❌ {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="success-message">
+        ✅ {{ successMessage }}
+      </div>
+      <div *ngIf="showSignupMessage" class="heart-taken-message">
+        💔 This heart is already taken! Please try a different username or email.
+      </div>
+
+      <!-- Login Form -->
+      <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+        <h2>Login</h2>
+        
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            formControlName="username"
+            placeholder="Enter your username"
+            [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+          >
+          <small *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="field-error">
+            {{ getLoginErrorMessage() }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password"
+            placeholder="Enter your password"
+            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          >
+          <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="field-error">
+            {{ getPasswordErrorMessage() }}
+          </small>
+        </div>
+
+        <button type="submit" class="auth-btn" [disabled]="loginForm.invalid || isLoading">
+          {{ isLoading ? 'Loading...' : 'Login' }}
+        </button>
+
+        <p class="toggle-link">
+          Don't have an account? 
+          <span (click)="toggleMode()">Sign up here</span>
+        </p>
+      </form>
+
+      <!-- Signup Form -->
+      <form *ngIf="!isLoginMode" [formGroup]="signupForm" (ngSubmit)="onSignup()" class="auth-form">
+        <h2>Sign Up</h2>
+        
+        <div class="form-group">
+          <label for="signup-username">Username</label>
+          <input 
+            type="text" 
+            id="signup-username" 
+            formControlName="username"
+            placeholder="Choose a username"
+            [class.error]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
+          >
+          <small *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched" class="field-error">
+            Username must be at least 3 characters
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input 
+            type="email" 
+            id="signup-email" 
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          >
+          <small *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="field-error">
+            Please enter a valid email address
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input 
+            type="password" 
+            id="signup-password" 
+            formControlName="password"
+            placeholder="Create a password"
+            [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          >
+          <small *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched" class="field-error">
+            Password must be at least 6 characters
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-confirm-password">Confirm Password</label>
+          <input 
+            type="password" 
+            id="signup-confirm-password" 
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [class.error]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
+          >
+          <small *ngIf="signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched" class="field-error">
+            Passwords do not match
+          </small>
+        </div>
+
+        <button type="submit" class="auth-btn" [disabled]="signupForm.invalid || isLoading">
+          {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+        </button>
+
+        <p class="toggle-link">
+          Already have an account? 
+          <span (click)="toggleMode()">Login here</span>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

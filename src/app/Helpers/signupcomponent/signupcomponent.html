@@ -1,0 +1,100 @@
+<div class="signup-container">
+  <!-- Sad/Black & White Theme -->
+  <div class="sad-theme">
+    <div class="theme-indicator">
+      <span class="mood-icon">😢</span>
+      <span class="mood-text">Black & White Mode</span>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="auth-card">
+    <div class="auth-forms">
+      
+      <!-- Error/Success Messages -->
+      <div *ngIf="errorMessage" class="error-message">
+        ❌ {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="success-message">
+        ✅ {{ successMessage }}
+      </div>
+      
+      <!-- Special Heart Taken Message -->
+      <div *ngIf="showHeartTakenMessage" class="heart-taken-message">
+        <div class="heart-icon">💔</div>
+        <div class="message-text">This heart is already taken!</div>
+        <div class="sub-message">Please try a different username or email.</div>
+      </div>
+
+      <!-- Signup Form -->
+      <form [formGroup]="signupForm" (ngSubmit)="onSignup()" class="auth-form">
+        <h2>Create Account</h2>
+        
+        <div class="form-group">
+          <label for="signup-username">Username</label>
+          <input 
+            type="text" 
+            id="signup-username" 
+            formControlName="username"
+            placeholder="Choose a username"
+            [class.error]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
+          >
+          <small *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched" class="field-error">
+            {{ getUsernameErrorMessage() }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input 
+            type="email" 
+            id="signup-email" 
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          >
+          <small *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched" class="field-error">
+            {{ getEmailErrorMessage() }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input 
+            type="password" 
+            id="signup-password" 
+            formControlName="password"
+            placeholder="Create a password"
+            [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          >
+          <small *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched" class="field-error">
+            {{ getPasswordErrorMessage() }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-confirm-password">Confirm Password</label>
+          <input 
+            type="password" 
+            id="signup-confirm-password" 
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [class.error]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
+          >
+          <small *ngIf="signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched" class="field-error">
+            Passwords do not match
+          </small>
+        </div>
+
+        <button type="submit" class="auth-btn" [disabled]="signupForm.invalid || isLoading">
+          {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+        </button>
+
+        <p class="toggle-link">
+          Already have an account? 
+          <a routerLink="/login">Login here</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
