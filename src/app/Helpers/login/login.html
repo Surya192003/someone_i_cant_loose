@@ -28,7 +28,13 @@
           <p><strong>Email:</strong> {{ currentUser?.email }}</p>
           <p><strong>Member since:</strong> {{ currentUser?.createdAt | date:'mediumDate' }}</p>
         </div>
-        <button class="logout-btn" (click)="onLogout()">
+        
+        <!-- The New Memories Button -->
+        <button class="recall-btn" (click)="goToDashboard()">
+          Let's recall memories ✨
+        </button>
+
+        <button class="logout-btn secondary-btn" (click)="onLogout()">
           Logout
         </button>
       </div>

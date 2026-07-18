@@ -9,7 +9,8 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,RouterModule
+    ReactiveFormsModule,
+    RouterModule
   ],
   templateUrl: './signupcomponent.html',
   styleUrl: './signupcomponent.css',
@@ -61,7 +62,7 @@ export class Signupcomponent {
       const response = await this.authService.signup(userData).toPromise();
 
       if (response?.success) {
-        this.successMessage = response.message;
+        this.successMessage = response.message || 'Account created successfully!';
         this.showHeartTakenMessage = false;
         
         // Navigate to login after successful signup
@@ -78,11 +79,11 @@ export class Signupcomponent {
         }
       }
     } catch (error: any) {
-      if (error.message?.includes('already taken')) {
+      if (error.error?.message?.includes('already taken') || error.message?.includes('already taken')) {
         this.showHeartTakenMessage = true;
         this.errorMessage = '';
       } else {
-        this.errorMessage = error.message || 'Signup failed. Please try again.';
+        this.errorMessage = error.error?.message || error.message || 'Signup failed. Please try again.';
       }
     } finally {
       this.isLoading = false;

@@ -1,12 +1,14 @@
+// src/app/services/auth.service.ts
+
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { API_CONFIG } from '../config/api.config';
 
 export interface User {
   id: number;
   username: string;
   email: string;
-  password: string;
   isActive: boolean;
   createdAt: string;
   lastLogin: string | null;
@@ -15,8 +17,19 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  user?: Omit<User, 'password'>;
+  user?: User;
   token?: string;
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+export interface SignupData {
+  username: string;
+  email: string;
+  password: string;
 }
 
 @Injectable({
@@ -26,125 +39,63 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  // Mock database
-  private mockUsers: User[] = [
-    {
-      id: 1,
-      username: "Swethaaaaaaa",
-      email: "swetha@gmail.com",
-      password: "Missyoueveryday",
-      isActive: true,
-      createdAt: "2024-01-15",
-      lastLogin: null
-    },
-    {
-      id: 2,
-      username: "JohnDoe",
-      email: "john@example.com",
-      password: "JohnPass123",
-      isActive: true,
-      createdAt: "2024-02-20",
-      lastLogin: null
-    }
-  ];
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+  public isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
-  constructor() {
+  constructor(private http: HttpClient) {
     // Check localStorage on init
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    const token = localStorage.getItem('authToken');
+    
+    if (savedUser && token) {
       try {
         const user = JSON.parse(savedUser);
         this.currentUserSubject.next(user);
+        this.isLoggedInSubject.next(true);
       } catch (e) {
-        localStorage.removeItem('currentUser');
+        this.clearAuthData();
       }
     }
   }
 
-  login(username: string, password: string): Observable<AuthResponse> {
-    return of(null).pipe(
-      delay(800),
-      map(() => {
-        const user = this.mockUsers.find(
-          u => u.username === username && u.password === password
-        );
-
-        if (user) {
-          const token = 'mock-jwt-token-' + Date.now();
-          const { password: _, ...userWithoutPassword } = user;
-          
-          this.currentUserSubject.next(user);
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          localStorage.setItem('authToken', token);
-
-          return {
-            success: true,
-            message: 'Login successful! Welcome back! 🎉',
-            user: userWithoutPassword,
-            token
-          };
-        } else {
-          return {
-            success: false,
-            message: 'Invalid username or password. Please try again.'
-          };
+  login(credentials: LoginCredentials): Observable<AuthResponse> {
+    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`;
+    return this.http.post<AuthResponse>(url, credentials).pipe(
+      tap(response => {
+        if (response.success && response.user && response.token) {
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          localStorage.setItem('authToken', response.token);
+          this.currentUserSubject.next(response.user);
+          this.isLoggedInSubject.next(true);
         }
       })
     );
   }
 
-  signup(userData: any): Observable<AuthResponse> {
-    return of(null).pipe(
-      delay(1000),
-      map(() => {
-        // Check if username or email already exists
-        const existingUser = this.mockUsers.find(
-          u => u.username === userData.username || u.email === userData.email
-        );
+  signup(userData: SignupData): Observable<AuthResponse> {
+    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.register}`;
+    return this.http.post<AuthResponse>(url, userData);
+  }
 
-        if (existingUser) {
-          return {
-            success: false,
-            message: 'This heart is already taken! 💔'
-          };
-        }
-
-        const newUser: User = {
-          id: this.mockUsers.length + 1,
-          username: userData.username,
-          email: userData.email,
-          password: userData.password,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          lastLogin: null
-        };
-
-        this.mockUsers.push(newUser);
-        
-        const { password: _, ...userWithoutPassword } = newUser;
-
-        return {
-          success: true,
-          message: 'Account created successfully! Please login. ❤️',
-          user: userWithoutPassword
-        };
+  logout(): Observable<any> {
+    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.logout}`;
+    const token = localStorage.getItem('authToken');
+    const headers = {
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+    
+    return this.http.post(url, {}, { headers }).pipe(
+      tap(() => {
+        this.clearAuthData();
       })
     );
   }
 
-  logout(): Observable<{ success: boolean; message: string }> {
-    return of(null).pipe(
-      delay(300),
-      map(() => {
-        this.currentUserSubject.next(null);
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('authToken');
-        return {
-          success: true,
-          message: 'Logged out successfully!'
-        };
-      })
-    );
+  private clearAuthData(): void {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    this.currentUserSubject.next(null);
+    this.isLoggedInSubject.next(false);
   }
 
   getCurrentUser(): User | null {
@@ -152,6 +103,10 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
+    return this.isLoggedInSubject.value;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('authToken');
   }
 }

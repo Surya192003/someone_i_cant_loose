@@ -2,49 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-
-// Mock user data for the backend
-export const MOCK_USERS = [
-  {
-    id: 1,
-    username: "Swethaaaaaaa",
-    email: "swetha@gmail.com",
-    password: "Missyoueveryday",
-    isActive: true,
-    createdAt: "2024-01-15",
-    lastLogin: null
-  },
-  // Additional mock users for testing
-  {
-    id: 2,
-    username: "JohnDoe",
-    email: "john@example.com",
-    password: "JohnPass123",
-    isActive: true,
-    createdAt: "2024-02-20",
-    lastLogin: null
-  }
-];
-
-// Mock backend service interface
-export interface IAuthResponse {
-  success: boolean;
-  message: string;
-  user?: any;
-  token?: string;
-}
-
-export interface ILoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface ISignupRequest {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -54,8 +12,7 @@ export interface ISignupRequest {
   styleUrl: './login.css',
 })
 export class Login implements OnInit {
-
- loginForm: FormGroup;
+  loginForm: FormGroup;
   signupForm: FormGroup;
   isLoginMode = true;
   isLoggedIn = false;
@@ -65,90 +22,10 @@ export class Login implements OnInit {
   isLoading = false;
   currentUser: any = null;
 
-  // Mock backend methods
-  private mockBackend = {
-    // Simulate login API call
-    login(credentials: ILoginRequest): Promise<IAuthResponse> {
-      return new Promise((resolve, reject) => {
-        // Simulate network delay
-        setTimeout(() => {
-          const user = MOCK_USERS.find(
-            u => u.username === credentials.username && u.password === credentials.password
-          );
-
-          if (user) {
-            resolve({
-              success: true,
-              message: 'Login successful! Welcome back!',
-              user: user,
-              token: 'mock-jwt-token-' + Date.now()
-            });
-          } else {
-            reject({
-              success: false,
-              message: 'Invalid username or password. Please try again.'
-            });
-          }
-        }, 800);
-      });
-    },
-
-    // Simulate signup API call
-    signup(userData: ISignupRequest): Promise<IAuthResponse> {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Check if username already exists
-          const existingUser = MOCK_USERS.find(
-            u => u.username === userData.username || u.email === userData.email
-          );
-
-          if (existingUser) {
-            reject({
-              success: false,
-              message: 'This heart is already taken! 💔'
-            });
-          } else {
-            // In a real backend, we would save the user
-            const newUser = {
-              id: MOCK_USERS.length + 1,
-              username: userData.username,
-              email: userData.email,
-              password: userData.password,
-              isActive: true,
-              createdAt: new Date().toISOString(),
-              lastLogin: null
-            };
-            
-            // Add to mock database (in memory)
-            MOCK_USERS.push(newUser);
-            
-            resolve({
-              success: true,
-              message: 'Signup successful! Please login.',
-              user: newUser,
-              token: 'mock-jwt-token-' + Date.now()
-            });
-          }
-        }, 1000);
-      });
-    },
-
-    // Simulate logout
-    logout(): Promise<{ success: boolean; message: string }> {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            success: true,
-            message: 'Logged out successfully!'
-          });
-        }, 300);
-      });
-    }
-  };
-
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -164,16 +41,18 @@ export class Login implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user is already logged in (from localStorage in real app)
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
-        this.currentUser = JSON.parse(savedUser);
+    // Check if user is already logged in
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
         this.isLoggedIn = true;
-      } catch (e) {
-        localStorage.removeItem('currentUser');
+        this.currentUser = user;
+        // Navigate to dashboard if already logged in
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.isLoggedIn = false;
+        this.currentUser = null;
       }
-    }
+    });
   }
 
   passwordMatchValidator(group: FormGroup): any {
@@ -202,30 +81,30 @@ export class Login implements OnInit {
     this.successMessage = '';
 
     try {
-      const credentials: ILoginRequest = {
+      const credentials = {
         username: this.loginForm.get('username')?.value,
         password: this.loginForm.get('password')?.value
       };
 
-      const response = await this.mockBackend.login(credentials);
+      const response = await this.authService.login(credentials).toPromise();
       
-      this.successMessage = response.message;
-      this.isLoggedIn = true;
-      this.currentUser = response.user;
-      
-      // Save user to localStorage
-      localStorage.setItem('currentUser', JSON.stringify(response.user));
-      localStorage.setItem('authToken', response.token || '');
-      
-      // Reset form
-      this.loginForm.reset();
-      
-      // Show success state
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
+      if (response?.success) {
+        this.successMessage = response.message || 'Login successful!';
+        this.isLoggedIn = true;
+        this.currentUser = response.user;
+        
+        // Reset form
+        this.loginForm.reset();
+        
+        // Navigate to dashboard
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 500);
+      } else {
+        this.errorMessage = response?.message || 'Login failed. Please try again.';
+      }
     } catch (error: any) {
-      this.errorMessage = error.message || 'Login failed. Please try again.';
+      this.errorMessage = error.error?.message || error.message || 'Login failed. Please try again.';
     } finally {
       this.isLoading = false;
     }
@@ -243,30 +122,39 @@ export class Login implements OnInit {
     this.showSignupMessage = false;
 
     try {
-      const userData: ISignupRequest = {
+      const userData = {
         username: this.signupForm.get('username')?.value,
         email: this.signupForm.get('email')?.value,
-        password: this.signupForm.get('password')?.value,
-        confirmPassword: this.signupForm.get('confirmPassword')?.value
+        password: this.signupForm.get('password')?.value
       };
 
-      const response = await this.mockBackend.signup(userData);
+      const response = await this.authService.signup(userData).toPromise();
       
-      this.successMessage = response.message;
-      this.showSignupMessage = false;
-      
-      // Switch to login mode after successful signup
-      setTimeout(() => {
-        this.toggleMode();
-        this.successMessage = 'Account created! Please login.';
-      }, 1500);
-      
+      if (response?.success) {
+        this.successMessage = response.message || 'Account created successfully!';
+        this.showSignupMessage = false;
+        
+        // Switch to login mode after successful signup
+        setTimeout(() => {
+          this.toggleMode();
+          this.successMessage = 'Account created! Please login.';
+        }, 1500);
+      } else {
+        // Check if it's the "heart already taken" message
+        if (response?.message?.includes('already taken')) {
+          this.showSignupMessage = true;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = response?.message || 'Signup failed. Please try again.';
+        }
+      }
     } catch (error: any) {
-      if (error.message?.includes('already taken')) {
+      if (error.error?.message?.includes('already taken') || error.message?.includes('already taken')) {
         this.showSignupMessage = true;
         this.errorMessage = '';
+      } else {
+        this.errorMessage = error.error?.message || error.message || 'Signup failed. Please try again.';
       }
-      this.errorMessage = error.message || 'Signup failed. Please try again.';
     } finally {
       this.isLoading = false;
     }
@@ -274,11 +162,9 @@ export class Login implements OnInit {
 
   async onLogout(): Promise<void> {
     try {
-      await this.mockBackend.logout();
+      await this.authService.logout().toPromise();
       this.isLoggedIn = false;
       this.currentUser = null;
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
       this.successMessage = 'Logged out successfully!';
       
       setTimeout(() => {
@@ -294,6 +180,10 @@ export class Login implements OnInit {
     if (control?.hasError('required')) return 'Username is required';
     if (control?.hasError('minlength')) return 'Username must be at least 3 characters';
     return '';
+  }
+
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 
   getPasswordErrorMessage(): string {
